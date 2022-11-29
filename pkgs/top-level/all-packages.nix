@@ -10611,6 +10611,8 @@ with pkgs;
 
   pastebinit = callPackage ../tools/misc/pastebinit { };
 
+  paramiko-ng = python3Packages.callPackage ../development/python-modules/paramiko-ng { };
+
   pmacct = callPackage ../tools/networking/pmacct { };
 
   pmix = callPackage ../development/libraries/pmix { };
@@ -35025,11 +35027,15 @@ with pkgs;
 
   zaz = callPackage ../games/zaz { };
 
+  ZEO = python3Packages.callPackage ../development/python-modules/ZEO {};
+
   zdbsp = callPackage ../games/zdoom/zdbsp.nix { };
 
   zdoom = callPackage ../games/zdoom { };
 
   zod = callPackage ../games/zod { };
+
+  zodburi = python3Packages.callPackage ../development/python-modules/zodburi {};
 
   zoom = callPackage ../games/zoom { };
 
@@ -37104,6 +37110,8 @@ with pkgs;
   pyupgrade = with python3Packages; toPythonApplication pyupgrade;
 
   pwncat = python3Packages.callPackage ../tools/security/pwncat { };
+
+  pwncat-cs = python3Packages.callPackage ../tools/security/pwncat-cs { };
 
   pwntools = with python3Packages; toPythonApplication pwntools;
 
