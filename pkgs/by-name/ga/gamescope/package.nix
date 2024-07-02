@@ -1,10 +1,13 @@
 { stdenv
+, edid-decode
 , fetchFromGitHub
 , meson
 , pkg-config
 , ninja
+, cmake
 , xorg
 , libdrm
+, libei
 , vulkan-loader
 , vulkan-headers
 , wayland
@@ -17,16 +20,16 @@
 , SDL2
 , pipewire
 , pixman
+, python3
 , libinput
 , glslang
 , hwdata
-, openvr
 , stb
 , wlroots
-, libliftoff
-, libdisplay-info
+, libdecor
 , lib
 , makeBinaryWrapper
+, patchelfUnstable
 , nix-update-script
 , enableExecutable ? true
 , enableWsi ? true
@@ -41,20 +44,17 @@ let
 in
 stdenv.mkDerivation (finalAttrs: {
   pname = "gamescope";
-  version = "3.14.2";
+  version = "3.14.22";
 
   src = fetchFromGitHub {
     owner = "ValveSoftware";
     repo = "gamescope";
     rev = "refs/tags/${finalAttrs.version}";
     fetchSubmodules = true;
-    hash = "sha256-Ym1kl9naAm1MGlxCk32ssvfiOlstHiZPy7Ga8EZegus=";
+    hash = "sha256-/muitEE3LCU6Xnjbpczb/zy2JRvUbBPT5L13T/v3MvE=";
   };
 
   patches = [
-    # Unvendor dependencies
-    ./use-pkgconfig.patch
-
     # Make it look for shaders in the right place
     ./shaders-path.patch
   ];
@@ -63,6 +63,8 @@ stdenv.mkDerivation (finalAttrs: {
   # so `placeholder "out"` ends up pointing to the wrong place
   postPatch = ''
     substituteInPlace src/reshade_effect_manager.cpp --replace "@out@" "$out"
+    # Patching shebangs in the main `libdisplay-info` build
+    patchShebangs subprojects/libdisplay-info/tool/gen-search-table.py
   '';
 
   mesonFlags = [
@@ -83,6 +85,12 @@ stdenv.mkDerivation (finalAttrs: {
     meson
     pkg-config
     ninja
+    # For `libdisplay-info`
+    python3
+    hwdata
+    edid-decode
+    # For OpenVR
+    cmake
   ] ++ lib.optionals enableExecutable [
     makeBinaryWrapper
     glslang
@@ -95,11 +103,10 @@ stdenv.mkDerivation (finalAttrs: {
     wayland
     wayland-protocols
     vulkan-loader
-    openvr
     glm
   ] ++ lib.optionals enableWsi [
     vulkan-headers
-  ] ++ lib.optionals enableExecutable [
+  ] ++ lib.optionals enableExecutable (wlroots.buildInputs ++ [  # gamescope uses a custom wlroots branch
     xorg.libXcomposite
     xorg.libXcursor
     xorg.libXdamage
@@ -112,19 +119,22 @@ stdenv.mkDerivation (finalAttrs: {
     xorg.libXxf86vm
     libavif
     libdrm
-    libliftoff
+    libei
     SDL2
-    wlroots
+    libdecor
     libinput
     libxkbcommon
     gbenchmark
     pixman
     libcap
     stb
-    libdisplay-info
-  ];
+  ]);
 
   postInstall = lib.optionalString enableExecutable ''
+    # using patchelf unstable because the stable version corrupts the binary
+    ${lib.getExe patchelfUnstable} $out/bin/gamescope \
+      --add-rpath ${vulkan-loader}/lib --add-needed libvulkan.so.1
+
     # --debug-layers flag expects these in the path
     wrapProgram "$out/bin/gamescope" \
       --prefix PATH : ${with xorg; lib.makeBinPath [xprop xwininfo]}

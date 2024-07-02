@@ -29,7 +29,7 @@ in
     services.xserver.desktopManager.enlightenment.enable = mkOption {
       type = types.bool;
       default = false;
-      description = lib.mdDoc "Enable the Enlightenment desktop environment.";
+      description = "Enable the Enlightenment desktop environment.";
     };
 
   };
@@ -96,7 +96,7 @@ in
 
     services.udisks2.enable = true;
     services.upower.enable = config.powerManagement.enable;
-    services.xserver.libinput.enable = mkDefault true;
+    services.libinput.enable = mkDefault true;
 
     services.dbus.packages = [ e.efl ];
 

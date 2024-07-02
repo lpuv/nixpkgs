@@ -3,19 +3,19 @@
 , libarchive, djvulibre, libheif, openjpeg, libjxl, libraw, lua5_3, poppler
 , gspell, libtiff, libwebp
 , gphoto2, imagemagick, yad, exiftool, gnome, libnotify
-, wrapGAppsHook, fetchpatch, doxygen
+, wrapGAppsHook3, fetchpatch, doxygen
 , nix-update-script
 }:
 
 stdenv.mkDerivation rec {
   pname = "geeqie";
-  version = "2.2";
+  version = "2.4";
 
   src = fetchFromGitHub {
     owner = "BestImageViewer";
     repo = "geeqie";
     rev = "v${version}";
-    hash = "sha256-13Ayr6r4JhqexaUvwzdc6XHT+j2l2D5YBws6gSAhU3Y=";
+    hash = "sha256-MVBKaiKcKknU0rChUYJ+N4oX4tVm145s+NqGQuDHY2g=";
   };
 
   patches = [
@@ -23,11 +23,6 @@ stdenv.mkDerivation rec {
     (fetchpatch {
       url = "https://salsa.debian.org/debian/geeqie/-/raw/debian/master/debian/patches/Remove-changelog-from-menu-item.patch";
       hash = "sha256-0awKKTLg/gUZhmwluVbHCOqssog9SneFOaUtG89q0go=";
-    })
-    # Fix missing execute permissions for geocode-parametres.awk plugin
-    (fetchpatch {
-      url = "https://github.com/BestImageViewer/geeqie/commit/4d3ddcf5b9c0668bfdaf1dfe24219ee57c2f0237.patch";
-      hash = "sha256-Na2qiwCTbOv1yt251oaSZiLaOwJCkjWew+us4lQju0I=";
     })
   ];
 
@@ -37,7 +32,7 @@ stdenv.mkDerivation rec {
 
   nativeBuildInputs =
     [ pkg-config gettext intltool
-      wrapGAppsHook doxygen
+      wrapGAppsHook3 doxygen
       meson ninja xxd
     ];
 

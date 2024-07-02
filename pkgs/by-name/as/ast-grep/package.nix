@@ -7,16 +7,16 @@
 
 rustPlatform.buildRustPackage rec {
   pname = "ast-grep";
-  version = "0.20.3";
+  version = "0.24.1";
 
   src = fetchFromGitHub {
     owner = "ast-grep";
     repo = "ast-grep";
     rev = version;
-    hash = "sha256-R8xzj6QcLXdttk7fxqLmJht3vSGryWKf2/Swod4R23w=";
+    hash = "sha256-kNPmtaUb5rMbdTlNKD3PrInuxGQt/JamMDx8BwBxVd8=";
   };
 
-  cargoHash = "sha256-490NoWXvGv8vvW0oHYlal/dIPq9y99At9mepDTcEWko=";
+  cargoHash = "sha256-iV2GXH7opNIyWsgi0EnRIXDhJd3s66qFhnZWawBPb6g=";
 
   nativeBuildInputs = [ installShellFiles ];
 
@@ -48,7 +48,7 @@ rustPlatform.buildRustPackage rec {
 
   meta = with lib; {
     mainProgram = "sg";
-    description = "A fast and polyglot tool for code searching, linting, rewriting at large scale";
+    description = "Fast and polyglot tool for code searching, linting, rewriting at large scale";
     homepage = "https://ast-grep.github.io/";
     changelog = "https://github.com/ast-grep/ast-grep/blob/${src.rev}/CHANGELOG.md";
     license = licenses.mit;

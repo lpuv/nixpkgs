@@ -106,7 +106,7 @@ let
     dontStrip = debug;
 
     meta = with lib; {
-      description = "The Interactive C++ Interpreter";
+      description = "Interactive C++ Interpreter";
       mainProgram = "cling";
       homepage = "https://root.cern/cling/";
       license = with licenses; [ lgpl21 ncsa ];
@@ -155,11 +155,41 @@ let
 
 in
 
-runCommand "cling-${unwrapped.version}" {
+stdenv.mkDerivation {
+  pname = "cling";
+  version = unwrapped.version;
+
   nativeBuildInputs = [ makeWrapper ];
   inherit unwrapped flags;
   inherit (unwrapped) meta;
-} ''
-  makeWrapper $unwrapped/bin/cling $out/bin/cling \
-    --add-flags "$flags"
-''
+
+  dontUnpack = true;
+  dontConfigure = true;
+
+  buildPhase = ''
+    runHook preBuild
+
+    makeWrapper $unwrapped/bin/cling $out/bin/cling \
+      --add-flags "$flags"
+
+    runHook postBuild
+  '';
+
+  doCheck = true;
+  checkPhase = ''
+    runHook preCheck
+
+    output=$($out/bin/cling <<EOF
+    #include <iostream>
+    std::cout << "hello world" << std::endl
+    EOF
+    )
+
+    echo "$output" | grep -q "Type C++ code and press enter to run it"
+    echo "$output" | grep -q "hello world"
+
+    runHook postCheck
+  '';
+
+  dontInstall = true;
+}
